@@ -1,0 +1,35 @@
+---
+# tasks file for react
+
+    - name: copy files to react node
+      ansible.builtin.copy:
+        src: react/
+        dest: "{{ container_path }}"
+
+    - name: kill running {{ container_name }} container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: delete {{ image_name }} image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        state: absent
+
+    - name: build docker image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        build:
+          path: "{{ container_path }}"
+        source: build
+        state: present
+      register: image_info
+      notify: run the container
+
+
+    - name: print image_info
+      ansible.builtin.debug:
+        var: image_info
+
+

@@ -1,0 +1,44 @@
+---
+# tasks file for nodejs
+
+- name: copy files to nodejs node
+  ansible.builtin.copy:
+    src: nodejs/
+    dest: "{{ container_path }}"
+
+- name: kill {{ container_name }} container
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: absent
+    force_kill: true
+
+- name: delete {{ image_name }} image
+  community.docker.docker_image:
+    name: "{{ image_name }}"
+    state: absent
+
+- name: build docker image
+  community.docker.docker_image:
+    name: "{{ image_name }}"
+    build:
+      path: "{{ container_path }}"
+    source: build
+    state: present
+  register: image_info
+
+- name: print image_info
+  ansible.builtin.debug:
+    var: image_info
+
+- name: run docker container
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    image: "{{ image_name }}"
+    ports: 
+      - "5000:5000"
+    state: started
+  register: container_info
+
+- name: print container_info
+  ansible.builtin.debug:
+    var: container_info

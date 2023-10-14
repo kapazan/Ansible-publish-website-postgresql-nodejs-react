@@ -1,0 +1,23 @@
+- name: install docker
+  hosts: _development
+  become: true
+  roles:
+    - docker
+
+- name: postgresql configuration
+  hosts: _ansible_postgresql
+  become: true
+  roles:
+    - postgre
+  
+- name: postgresql configuration
+  hosts: _ansible_nodejs
+  become: true
+  roles:
+    - nodejs
+
+- name: postgresql configuration
+  hosts: _ansible_react
+  become: true
+  roles:
+    - react
